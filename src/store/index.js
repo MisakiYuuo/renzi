@@ -7,16 +7,17 @@ import user from './modules/user'
 
 Vue.use(Vuex)
 const test = {
-  namespaced: true, // 添加命名空间，防止重名调用
+  namespaced: true,
   state: {
-    token: null
+    token: ''
   },
   mutations: {
-    setToken(state, token) {
-      state.token = token
+    setToken: (state) => {
+      state.token = 'abc'
     }
   }
 }
+
 const store = new Vuex.Store({
   modules: {
     app,
@@ -24,38 +25,17 @@ const store = new Vuex.Store({
     user,
     test
   },
-  // 定义计算属性
-  getters: {
-    showCount: state => 'count=' + state.count,
-    ...getters
-  },
   state: {
-    count: 0,
-    age: 20
+    count: 0
   },
   mutations: {
     add(state) {
       state.count++
-    },
-    addNum(state, num) {
-      state.count += num
     }
   },
-  // 异步方法
-  actions: {
-    addSync(context) {
-      // context === $store
-      setTimeout(() => {
-        context.commit('add')
-      }, 1000)
-    },
-    // 传参
-    addNsync(context, num) {
-      // context === $store
-      setTimeout(() => {
-        context.commit('addNum', num)
-      }, 1000)
-    }
+  getters: {
+    showCount: (state) => 'count=' + state.count,
+    ...getters
   }
 })
 

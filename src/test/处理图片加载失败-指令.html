@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.14/vue.js" type="application/javascript"></script>
+</head>
+<body>
+  <div id="app">
+    <img v-imgerror="imgDefault" src="http://q6cu3t6jv.bkt.clouddn.com/1063705989926227968?t=1582797590950">
+    <img v-imgerror="'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fnimg.ws.126.net%2F%3Furl%3Dhttp%253A%252F%252Fdingyue.ws.126.net%252F2021%252F1015%252F50498182j00r10ks5000uc000hs00d4m.jpg%26thumbnail%3D650x2147483647%26quality%3D80%26type%3Djpg&refer=http%3A%2F%2Fnimg.ws.126.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1665887052&t=6144ef0bde1f06882bb6436a7e160940'" src="http://q6cu3t6jv.bkt.clouddn.com/1063705989926227968?t=1582797590950">
+  </div>
+</body>
+<script>
+  //什么是指令?
+  //目的: 就是用来操作dom/组件
+  //特征: v-xxx开头的自定义属性
+  Vue.directive('imgerror',{
+    inserted(el, binding){
+      el.onerror = function(){
+        this.src = binding.value
+      }
+    }
+  })
+  let vm = new Vue({
+    el: '#app',
+    data(){
+      return {
+        imgDefault:'https://img2.baidu.com/it/u=3791594086,1804445139&fm=253&fmt=auto&app=120&f=JPEG?w=658&h=494'
+      }
+    },
+    mounted() {
+
+    },
+    methods: {
+
+    },
+  })
+</script>
+</html>

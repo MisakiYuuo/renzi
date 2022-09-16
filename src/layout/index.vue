@@ -1,11 +1,9 @@
 <template>
   <div :class="classObj" class="app-wrapper">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <!-- 左侧导航栏 -->
     <sidebar class="sidebar-container" />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <!-- 顶部导航栏 -->
         <navbar />
       </div>
       <app-main />
@@ -16,6 +14,8 @@
 <script>
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
+import { getUserInfoAPI } from '@/api'
+import { getUserInfo } from '@/api/user'
 
 export default {
   name: 'Layout',
