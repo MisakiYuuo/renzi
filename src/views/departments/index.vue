@@ -5,73 +5,91 @@
         <el-tabs v-model="activeName">
           <el-tab-pane label="用户管理" name="first"></el-tab-pane>
         </el-tabs>
-        <el-row type="flex" justify="end" class="row-bg">
-          <el-col :span="12"><div class="grid-content"><span style="font-weight:bold">江苏传智播客教育科技股份有限公司</span></div></el-col>
-          <el-col :span="12" class="right"><div class="grid-content">
-            <span style="margin-right:4px">负责人</span>
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                操作<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>添加子部门</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </div></el-col>
-        </el-row>
+        <div style="border-bottom: 1px solid #cfcfcf;padding-bottom: 5px;margin-bottom:5px">
+          <tree-tool :node="company" :data="company">
+            <el-dropdown-item>添加子部门</el-dropdown-item>
+          </tree-tool>
+        </div>
         <el-tree
           default-expand-all
           :data="list"
           :props="defaultProps"
         >
-          <span slot-scope="{ node, data }" class="custom-tree-node">
-            <span>{{ node.label }}</span>
-            <span>
-              <span style="font-size:14px">
-                {{ data.manager }}
-              </span>
-              <el-dropdown>
-                <span class="el-dropdown-link">
-                  操作<i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>添加子部门</el-dropdown-item>
-                  <el-dropdown-item>查看部门</el-dropdown-item>
-                  <el-dropdown-item>删除部门</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </span>
-          </span>
+          <template v-slot="{ node, data }">
+            <tree-tool :node="node" :data="data">
+              <el-dropdown-item @click.native="addDep(data)">添加子部门</el-dropdown-item>
+              <el-dropdown-item @click.native="editDep">编辑部门</el-dropdown-item>
+              <el-dropdown-item @click.native="delDep">删除部门</el-dropdown-item>
+            </tree-tool>
+          </template>
         </el-tree>
       </el-card>
+      <div v-if="dialogVisible">
+        <add-dept
+          :dialog-visible.sync="dialogVisible"
+          :all-department="allDepartment"
+          :is-edit="isEdit"
+          :current-department="currentDepartment"
+          @success="getDepartment"
+        ></add-dept>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import TreeTool from './components/TreeTool.vue'
+import AddDept from './components/AddDept.vue'
+import { reqDepartmentAPI } from '@/api/index.js'
+import { listToTree } from '@/utils/listToTree.js'
 export default {
   name: 'Departments',
-  components: {},
+  components: { TreeTool, AddDept },
   props: {},
   data() {
     return {
+      dialogVisible: false,
       activeName: 'first',
-      list: [
-        { name: '总裁办', manager: '曹操',
-          children: [
-            { name: '董事会', manager: '曹丕' }
-          ] },
-        { name: '行政部', manager: '刘备' },
-        { name: '人事部', manager: '孙权' }],
+      company: {
+        label: '黑马程序员',
+        manager: '负责人'
+      },
+      list: [],
       defaultProps: {
         children: 'children',
         label: 'name'
-      }
+      },
+      isEdit: false,
+      allDepartment: [],
+      currentDepartment: {}
     }
   },
-  created() {},
+  created() {
+    this.getDepartment()
+  },
   mounted() {},
-  methods: {}
+  methods: {
+    async getDepartment() {
+      const res = await reqDepartmentAPI()
+      this.allDepartment = res.depts
+      const { companyName, depts } = res
+      this.company.label = companyName
+      this.list = listToTree(depts, '')
+    },
+    addDep(data) {
+      this.dialogVisible = true
+      this.currentDepartment = data
+      this.isEdit = false
+    },
+    editDep() {
+      console.log('编辑')
+      this.dialogVisible = true
+      this.isEdit = true
+    },
+    delDep() {
+      console.log('删除')
+    }
+  }
 }
 </script>
 
@@ -79,9 +97,8 @@ export default {
 ::v-deep .el-card__body{
   padding:50px 80px;
   .row-bg{
-    margin:50px 80px 0;
-    border-bottom:1px solid #cfcfcf;
-    padding-bottom:10px;
+    //margin:50px 80px 0;
+    //border-bottom:1px solid #cfcfcf;
     span{
       font-size:14px;
     }
@@ -93,7 +110,7 @@ export default {
     }
   }
   .el-tree{
-    margin:15px 80px;
+    //margin:15px 80px;
     .custom-tree-node{
       display: flex;
       justify-content: space-between;
@@ -103,12 +120,6 @@ export default {
       height:36px;
     }
   }
-}
-.el-dropdown{
-  margin-left: 30px;
-}
-.el-dropdown-menu__item{
-  color:#409eff;
 }
 span{
   font-size:14px !important;
