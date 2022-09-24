@@ -10,12 +10,6 @@ export const login = data => request({
   url: '/sys/login',
   data
 })
-
-export function getInfo(token) {
-  return request({
-
-  })
-}
 /**
  * 获取用户基本资料
  * */

@@ -1,9 +1,9 @@
 <template>
   <div class="dashboard-container">
     <div class="app-container">
-      <el-card>
-        <el-tabs v-model="activeName">
-          <el-tab-pane label="用户管理" name="first"></el-tab-pane>
+      <el-card v-loading="loading">
+        <el-tabs>
+          <el-tab-pane label="用户管理"></el-tab-pane>
         </el-tabs>
         <div style="border-bottom: 1px solid #cfcfcf;padding-bottom: 5px;margin-bottom:5px">
           <tree-tool :node="company" :data="company">
@@ -18,17 +18,17 @@
           <template v-slot="{ node, data }">
             <tree-tool :node="node" :data="data">
               <el-dropdown-item @click.native="addDep(data)">添加子部门</el-dropdown-item>
-              <el-dropdown-item @click.native="editDep">编辑部门</el-dropdown-item>
-              <el-dropdown-item @click.native="delDep">删除部门</el-dropdown-item>
+              <el-dropdown-item @click.native="editDep(data)">编辑部门</el-dropdown-item>
+              <el-dropdown-item @click.native="delDep(data.id)">删除部门</el-dropdown-item>
             </tree-tool>
           </template>
         </el-tree>
       </el-card>
       <div v-if="dialogVisible">
         <add-dept
+          ref="edit-dep"
           :dialog-visible.sync="dialogVisible"
           :all-department="allDepartment"
-          :is-edit="isEdit"
           :current-department="currentDepartment"
           @success="getDepartment"
         ></add-dept>
@@ -40,8 +40,9 @@
 <script>
 import TreeTool from './components/TreeTool.vue'
 import AddDept from './components/AddDept.vue'
-import { reqDepartmentAPI } from '@/api/index.js'
+import { reqDeleteDepartmentAPI, reqDepartmentAPI } from '@/api/index.js'
 import { listToTree } from '@/utils/listToTree.js'
+import { cloneDeep } from 'lodash'
 export default {
   name: 'Departments',
   components: { TreeTool, AddDept },
@@ -49,7 +50,6 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      activeName: 'first',
       company: {
         label: '黑马程序员',
         manager: '负责人'
@@ -59,9 +59,9 @@ export default {
         children: 'children',
         label: 'name'
       },
-      isEdit: false,
       allDepartment: [],
-      currentDepartment: {}
+      currentDepartment: {},
+      loading: false
     }
   },
   created() {
@@ -70,24 +70,47 @@ export default {
   mounted() {},
   methods: {
     async getDepartment() {
+      this.loading = true
       const res = await reqDepartmentAPI()
       this.allDepartment = res.depts
       const { companyName, depts } = res
       this.company.label = companyName
       this.list = listToTree(depts, '')
+      this.loading = false
     },
     addDep(data) {
       this.dialogVisible = true
       this.currentDepartment = data
-      this.isEdit = false
     },
-    editDep() {
-      console.log('编辑')
+    editDep(data) {
       this.dialogVisible = true
-      this.isEdit = true
+      this.$nextTick(() => {
+        this.$refs['edit-dep'].formData = cloneDeep(data)
+      })
     },
-    delDep() {
-      console.log('删除')
+    delDep(id) {
+      try {
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async() => {
+          await reqDeleteDepartmentAPI(id)
+          this.getDepartment()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      } catch (error) {
+        console.log(error)
+        this.$message.error('删除失败')
+      }
     }
   }
 }

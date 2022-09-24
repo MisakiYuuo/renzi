@@ -1,38 +1,69 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-  >
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-</head>
-<body>
+<template>
+  <div>
+    <el-dialog v-bind="$attrs" v-on="$listeners" @open="onOpen" @close="onClose" title="Dialog Titile">
+      <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="100px">
+        <el-form-item label="角色名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入角色名称" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="region">
+          <el-input v-model="formData.region" placeholder="请输入角色描述" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="close">取消</el-button>
+        <el-button type="primary" @click="handelConfirm">确定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
 <script>
-  const list = [
-    { id: 1, name: 1, pid: '' },
-    { id: 2, name: 2, pid: 1 },
-    { id: 3, name: 3, pid: 2 },
-    { id: 4, name: 4, pid: 1 },
-    { id: 5, name: 5, pid: '' }
-  ]
-  function listToTree(list, pid) {
-    const arr = []
-    list.forEach(l => {
-      if (l.pid === pid) {
-        const children = listToTree(list, l.id)
-        if (children.length > 0) {
-          l.children = children
-        }
-        arr.push(l)
+  export default {
+    inheritAttrs: false,
+    components: {},
+    props: [],
+    data() {
+      return {
+        formData: {
+          name: undefined,
+          region: undefined,
+        },
+        rules: {
+          name: [{
+            required: true,
+            message: '请输入角色名称',
+            trigger: 'blur'
+          }],
+          region: [{
+            required: true,
+            message: '请输入角色描述',
+            trigger: 'blur'
+          }],
+        },
       }
-    })
-    return arr
+    },
+    computed: {},
+    watch: {},
+    created() {},
+    mounted() {},
+    methods: {
+      onOpen() {},
+      onClose() {
+        this.$refs['elForm'].resetFields()
+      },
+      close() {
+        this.$emit('update:visible', false)
+      },
+      handelConfirm() {
+        this.$refs['elForm'].validate(valid => {
+          if (!valid) return
+          this.close()
+        })
+      },
+    }
   }
 
-  console.log(listToTree(list, ''))
-
 </script>
-</body>
-</html>
+<style>
+</style>

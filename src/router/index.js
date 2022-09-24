@@ -55,6 +55,15 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
+  {
+    path: '/import',
+    component: Layout,
+    children: [{
+      path: '',
+      component: () => import('@/views/import/index.vue')
+    }],
+    hidden: true
+  },
 
   {
     path: '/',

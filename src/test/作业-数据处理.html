@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <pre>
+var arr = [
+    {id: 1,created: '2016-05-04 15:12:40',content: '1'},
+    {id: 2,created: '2016-04-06 15:12:40',content: '2'},
+    {id: 3,created: '2016-04-02 15:12:40',content: '3'},
+]
+将上面数据转换成下面数据格式
+方式:(1)使用原生的js
+(2)使用lodash
+提示
+思路:(1)思考转换成下面这种数据结果需要做哪些内容
+        分组
+        排序
+        数据结构
+(2)先做最简单内容
+需要用到操作:
+(1)数组map,sort
+(2)lodash的map,group,链式调用
+var map = [
+    {month: '4月', data: [
+        //(1)按月份分组,并且月份由小到大
+        {id: 3,created: '2016-04-02 15:12:40',content: '3'},//(2)按时间排序,由远到近
+        {id: 2,created: '2016-04-06 15:12:40',content: '2'}
+    ]},
+    {month: '5月', data: [
+        {id: 1,created: '2016-05-04 15:12:40',content: '1'}
+    ]}
+]
+    </pre>
+</body>
+<script>
+  const arr = [
+    {id: 1,created: '2016-05-04 15:12:40',content: '1'},
+    {id: 2,created: '2016-04-06 15:12:40',content: '2'},
+    {id: 3,created: '2016-04-02 15:12:40',content: '3'},
+  ]
+  let newArray = []
+  arr.forEach(item=>{
+    newArray.push(parseIntMonth(item.created))
+  })
+  let set = new Set(newArray)
+  let map = [...set].map(l=> {
+    return {month:l}
+  })
+  map.forEach(l=>{
+    arr.forEach(item=>{
+      if(parseIntMonth(item.created)===l.month){
+        if(!l.data){
+          l.data = []
+        }
+        l.data.push(item)
+      }
+    })
+  })
+  map.sort((a,b)=> {
+    return parseInt(a.month)-parseInt(b.month)
+  })
+  map.forEach(l=>{
+    l.data.sort((a,b)=>{
+      return parseInt(parseIntDay(a.created))-parseInt(parseIntDay(b.created))
+    })
+  })
+  console.log(map)
+
+  function parseIntMonth(date){
+    return new Date(date).toLocaleString('zh',{ month: 'short' })
+  }
+  function parseIntDay(date){
+    return new Date(date).toLocaleString('zh',{ day: 'numeric' })
+  }
+</script>
+
+</html>

@@ -5,6 +5,15 @@ const list = [
   { id: 4, name: 4, pid: 1 },
   { id: 5, name: 5, pid: '' }
 ]
+// list.forEach(t => {
+// let children = list.filter(m => m.pid === t.id)
+// if(children.length > 0) {
+// t.children = children
+// }
+// })
+
+// let result = list.filter(t => t.pid === '')
+// console.log(result)
 function listToTree(list, pid) {
   const arr = []
   list.forEach(l => {

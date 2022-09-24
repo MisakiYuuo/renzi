@@ -12,7 +12,7 @@
         <div class="avatar-wrapper">
           <!--实现自定义指令，并且此处会被webpack打包，必须使用require或import引入使用-->
           <img v-imgerror="require('../../assets/common/head.jpg')" :src="$store.state.user.userInfo.staffPhoto" class="user-avatar" alt="">
-          <span class="name">管理员</span>
+          <span class="name">{{ $store.state.user.userInfo.username }}</span>
           <i class="el-icon-caret-bottom" style="color:#fff" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑部门':'添加部门'"
+    :title="formData.id ? '编辑部门':'添加部门'"
     :visible.sync="dialogVisible"
     width="50%"
     :before-close="handleClose"
@@ -43,17 +43,13 @@
 </template>
 
 <script>
-import { reqAddDepartmentAPI, reqEmployeesAPI } from '@/api'
+import { reqAddDepartmentAPI, reqEmployeesAPI, reqUpdateDepartmentAPI } from '@/api'
 
 export default {
   name: 'AddDept',
   components: {},
   props: {
     dialogVisible: {
-      type: Boolean,
-      default: false
-    },
-    isEdit: {
       type: Boolean,
       default: false
     },
@@ -139,19 +135,31 @@ export default {
      * @param name  string  非必须    部门名称
      * @param pid  string  非必须    父级部门ID
      * */
-    async onSubmit() {
-      const newDepartment = {
-        ...{ pid: this.currentDepartment.id }, ...this.formData
+    onSubmit() {
+      this.$refs['elForm'].validate(async(valid) => {
+        if (valid) {
+          try {
+            if (this.formData.id) {
+              await reqUpdateDepartmentAPI(this.formData)
+              this.$message.success('修改部门成功')
+            } else {
+              await reqAddDepartmentAPI({
+                ...{ pid: this.currentDepartment.id }, ...this.formData
+              })
+              this.$message.success('添加部门成功')
+            }
+            this.$emit('success')
+          } catch (error) {
+            console.log(error)
+            this.$message.error('添加部门失败')
+          }
+          this.$emit('update:dialogVisible', false)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       }
-      try {
-        await reqAddDepartmentAPI(newDepartment)
-        this.$message.success('添加部门成功')
-        this.$emit('success')
-      } catch (error) {
-        console.log(error)
-        this.$message.error('添加部门失败')
-      }
-      this.$emit('update:dialogVisible', false)
+      )
     }
   }
 
